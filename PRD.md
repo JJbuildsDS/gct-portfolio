@@ -149,23 +149,19 @@ Implementation: material color overrides on the single `chicken.glb`. Spice-dust
 
 ---
 
-## 8. Case studies (4 zones)
+## 8. Case studies — DEFERRED
 
-| Slot | Project | Description | Assets |
-|------|---------|-------------|--------|
-| 1 | Pepper Pods Instagram | `[TBD — Jasraaj to provide: 1-sentence description, 2-3 images, optional stat or quote]` | `[TBD]` |
-| 2 | Avantus | `[TBD — Jasraaj to provide: 1-sentence description, 2-3 images, optional stat or quote]` | `[TBD]` |
-| 3 | `[TBD — Jasraaj to fill]` | `[TBD]` | `[TBD]` |
-| 4 | `[TBD — Jasraaj to fill]` | `[TBD]` | `[TBD]` |
+**Decision (2026-04-20):** Bruno's existing portfolio zones (ProjectsArea, CareerArea, LabArea, SocialArea) and their content data (`sources/data/projects.js`, `sources/data/lab.js`, `sources/data/social.js`) stay **UNTOUCHED** in v1. Jasraaj will swap content later.
 
-For each zone, content structure:
-- Headline (5-8 words)
-- Summary (2-3 sentences)
-- 2-3 images at 1200x800 or similar
-- Optional: 1-line stat or quote
-- Optional: outbound link to live project
+This means v1 ships with Bruno's original project showcase (Three.js Journey etc.) still visible in-world. The GCT rebrand applies to chrome (title, meta, welcome copy, credits, colors, chicken) but the zone CONTENT remains Bruno's until Jasraaj replaces it post-launch.
 
-Case study zones replace Bruno's portfolio zones 1:1. Zone assignments proposed by Claude Code in Phase 5 for Jasraaj approval.
+**When Jasraaj is ready to swap content:**
+1. Edit `sources/data/projects.js` — replace array entries with GCT case studies.
+2. Edit `sources/data/lab.js` and `sources/data/social.js` similarly.
+3. Replace image assets under `static/projects/`, `static/lab/`, `static/social/`.
+4. No code changes required — the zones read from data files.
+
+**Do NOT touch these files in v1 build.**
 
 ---
 
@@ -327,26 +323,9 @@ Task:
 Do not create 6 separate GLB files. Do not modify achievement unlock logic.
 ```
 
-### Phase 5: Case study zones (3-4 days)
+### Phase 5: Case study zones — DEFERRED to post-v1
 
-**Before session:** Jasraaj provides all 4 case studies with headline + summary + images. Session will not start without content.
-
-```
-Read CLAUDE.md, PRD.md §8, and ARCHITECTURE.md first.
-
-Task:
-1. Audit current portfolio zones and their trigger positions
-2. For each of 4 GCT case studies (Pepper Pods Instagram, Avantus, slots 3 and 4), propose:
-   a. Which existing Bruno zone it replaces (based on prominence and traffic flow in the world)
-   b. What 3D signage/billboard text changes (text only, don't redesign meshes)
-   c. What HTML panel content appears (headline, summary, images, optional stat)
-3. Produce content template I can fill per case study, then insert Jasraaj's provided copy
-4. Do NOT write case study copy yourself. Use Jasraaj's content only.
-
-Also: find "Bruno's Home" welcome zone and replace copy per PRD §4.3.
-
-If any case study lacks images or copy at session start, flag it and skip that zone.
-```
+See §8. Bruno's zones stay intact in v1. When Jasraaj is ready to swap content, editing the data files in `sources/data/` is sufficient (no code changes). This phase is not executed in the v1 build.
 
 ### Phase 6: Audio
 
@@ -446,8 +425,7 @@ If any of these come up mid-build, add to `FUTURE.md` and move on.
 - [ ] ARCHITECTURE.md at repo root (from Phase 1)
 - [ ] Chicken drives around the world with head-bob + wing-flap
 - [ ] All 6 spice skins functional and unlocking via Bruno's achievement conditions
-- [ ] 4 GCT case study zones live with real content
-- [ ] All "Bruno" copy replaced with GCT copy (zero misses)
+- [ ] All "Bruno" copy replaced with GCT copy (zero misses) — identity references only; zone content deferred (see §8)
 - [ ] Behind the Scene section has all 4 credit blocks (Bruno, Kounine, jeremy, Jasraaj)
 - [ ] Audio swapped: cluck honk, kukdu ku engine
 - [ ] Brand palette applied everywhere color appears
