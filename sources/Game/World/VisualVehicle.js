@@ -26,6 +26,7 @@ export class VisualVehicle
         this.setBoostAnimation()
         this.setScreenPosition()
         this.setPaints()
+        this.setChicken() // GCT: replace car with chicken mesh + hide car parts
 
         this.tickCallback = () =>
         {
@@ -415,13 +416,174 @@ export class VisualVehicle
         this.screenPosition = new THREE.Vector2(0, 0)
     }
 
+    /**
+     * GCT: load chicken, scale to car size, hide car body + wheels.
+     *
+     * The Poly Pizza chicken is one GLB mesh with 5 primitives (by color).
+     * Per ARCHITECTURE.md §9, we do NOT have separate head/wing submeshes,
+     * so head-bob + wing-flap become a whole-body procedural bob (pitch on
+     * accel, roll on turn, Y bounce scaled by speed).
+     *
+     * The chicken paintable region = the primitive whose source material was
+     * named 'FFFFFF' (the white body). Accent colors (beak, comb, feet) are
+     * preserved by re-wrapping in MeshLambertNodeMaterial (TSL-compatible).
+     */
+    setChicken()
+    {
+        const chickenResource = this.game.resources.chicken
+        if(!chickenResource || !chickenResource.scene)
+        {
+            console.warn('[VisualVehicle] chicken resource missing; falling back to car visuals')
+            return
+        }
+
+        // Clone so we don't mutate the shared loaded scene
+        const chickenInner = chickenResource.scene.clone(true)
+
+        // Scale from model space (~190u tall) down to vehicle bounds (~2.3u tall)
+        const CHICKEN_SCALE = 0.012
+        chickenInner.scale.setScalar(CHICKEN_SCALE)
+
+        // Nudge feet toward ground plane. Chassis center sits ~0.5u above
+        // ground; chicken feet at local Y=0 after scale means we subtract
+        // that offset to plant the feet where wheels contact.
+        chickenInner.position.y = -0.5
+
+        // The Poly Pizza chicken model faces +X in model space. Bruno's car
+        // chassis faces -X (wheel 0 is "front" at rotation.y = Math.PI).
+        // Rotate 180° so the beak points forward along the car's heading.
+        chickenInner.rotation.y = Math.PI
+
+        // Walk the chicken, convert PBR materials to TSL-compatible Lambert
+        // node materials (preserves hex color), flag the body mesh for paint.
+        chickenInner.traverse((child) =>
+        {
+            if(!child.isMesh) return
+
+            child.castShadow = true
+            child.receiveShadow = true
+
+            const src = child.material
+            const hexName = src && src.name ? src.name.toUpperCase() : null
+            const srcColor = (src && src.color) ? src.color : new THREE.Color(0xffffff)
+
+            const newMat = new THREE.MeshLambertNodeMaterial({ color: srcColor.clone() })
+            // Allow shadow self-intersection avoidance like Bruno's car materials
+            newMat.shadowSide = THREE.BackSide
+            child.material = newMat
+
+            // The FFFFFF (white body) primitive = paintable region
+            if(hexName === 'FFFFFF')
+            {
+                this.parts.chickenBody = child
+                // Track original mat so we can restore if needed
+                this.parts.chickenBody.userData.originalColor = srcColor.getHex()
+            }
+        })
+
+        // Top-level group that the physics sync writes to
+        this.parts.chicken = new THREE.Group()
+        this.parts.chicken.rotation.reorder('YXZ')
+        this.parts.chicken.add(chickenInner)
+        this.parts.chickenInner = chickenInner
+        this.game.scene.add(this.parts.chicken)
+
+        // Procedural bob state
+        this.chickenBob = {
+            time: 0,
+            amplitude: 0.10,
+            frequency: 14,
+            pitch: 0,
+            roll: 0,
+        }
+
+        // Hide the car's visible parts. Physics wheels + colliders remain
+        // untouched — we just don't render the visual car.
+        if(this.parts.chassis) this.parts.chassis.visible = false
+        if(this.parts.bodyPainted) this.parts.bodyPainted.visible = false
+        if(this.wheels && this.wheels.items)
+        {
+            for(const wheel of this.wheels.items)
+            {
+                if(wheel.container) wheel.container.visible = false
+            }
+        }
+
+        // Hook the skin system to target the chicken's body primitive.
+        // Bruno's setPaints ran before us and already initialized this.paints,
+        // but the default skin application happens at line ~241 via
+        // `this.paints.changeTo(this.game.achievements.rewards.current.name)`.
+        // That path sets `this.parts.bodyPainted.material = material`. We swap
+        // it to write to the chicken body instead.
+        const originalChangeTo = this.paints.changeTo
+        this.paints.changeTo = (name = 'red') =>
+        {
+            const material = this.paints.choices[name]
+            if(!material) return false
+            if(this.parts.chickenBody)
+            {
+                this.parts.chickenBody.material = material
+            }
+            // Also set on the (hidden) car body for consistency, so any other
+            // system that reads bodyPainted.material sees the right one.
+            if(this.parts.bodyPainted)
+            {
+                this.parts.bodyPainted.material = material
+            }
+            return true
+        }
+
+        // Apply the current reward paint now that the binding is rewired.
+        const currentReward = this.game.achievements?.rewards?.current?.name
+        if(currentReward)
+        {
+            this.paints.changeTo(currentReward)
+        }
+    }
+
     update()
     {
         const physicalVehicle = this.game.physicalVehicle
-        
-        // Chassis
+
+        // Chassis (always updated even when hidden — children may still need world transforms)
         this.parts.chassis.position.copy(physicalVehicle.position)
         this.parts.chassis.quaternion.copy(physicalVehicle.quaternion)
+
+        // GCT: sync chicken group to physics + apply procedural whole-body bob
+        if(this.parts.chicken && this.parts.chickenInner)
+        {
+            this.parts.chicken.position.copy(physicalVehicle.position)
+            this.parts.chicken.quaternion.copy(physicalVehicle.quaternion)
+
+            const dt = this.game.ticker.deltaScaled
+            this.chickenBob.time += dt
+
+            // Y bob: strong when moving, tiny idle breath when still
+            const speed = Math.abs(physicalVehicle.forwardSpeed || 0)
+            const movingFactor = Math.min(speed / 10, 1)
+            const bobAmt = movingFactor > 0.01
+                ? Math.sin(this.chickenBob.time * this.chickenBob.frequency) * this.chickenBob.amplitude * movingFactor
+                : Math.sin(this.chickenBob.time * 2.5) * 0.015
+
+            // Re-apply the -0.5 base offset then layer the bob
+            this.parts.chickenInner.position.y = -0.5 + bobAmt
+
+            // Pitch: lean forward when accelerating, back when braking
+            const forwardInput = (this.game.inputs.actions.get('forward').active ? 1 : 0)
+                                - (this.game.inputs.actions.get('backward').active ? 1 : 0)
+            const pitchTarget = -forwardInput * 0.18
+            this.chickenBob.pitch += (pitchTarget - this.chickenBob.pitch) * dt * 6
+
+            // Roll: bank into turns (steering already smoothed above in wheel code — use it on next frame)
+            const rollTarget = -(this.wheels?.steering || 0) * 0.35
+            this.chickenBob.roll += (rollTarget - this.chickenBob.roll) * dt * 6
+
+            this.parts.chickenInner.rotation.x = this.chickenBob.pitch
+            // Z roll is in the INNER group's local frame; because we rotated
+            // the inner group 180° on Y, a +Z roll from steering becomes the
+            // visually-correct bank. Keep sign consistent.
+            this.parts.chickenInner.rotation.z = this.chickenBob.roll
+        }
         
         // Wheels
         this.wheels.steering += ((this.game.player.steering * physicalVehicle.steeringAmplitude) - this.wheels.steering) * this.game.ticker.deltaScaled * 16
