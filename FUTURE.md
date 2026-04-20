@@ -34,3 +34,23 @@ Open a new phase/milestone after v1.0 ships.
 
 ## Skin upgrades
 - Commissioned rendered skin preview images (replace v1 placeholder PNGs)
+
+## Repo hygiene
+- **Purge Blender backup bloat from git history.** Bruno's upstream commits
+  contain multiple 50 MB `resources/folio-2025.blend1` snapshots, triggering
+  GitHub's large-file warning (soft; 50 MB is the recommended ceiling, hard
+  limit is 100 MB). Push works but every clone pulls ~150 MB of redundant
+  blend backups. Fix with `git filter-repo` or BFG Repo-Cleaner:
+  ```bash
+  brew install git-filter-repo
+  cd /Users/jasraajpuri/projects/gct-portfolio
+  git filter-repo --path resources/folio-2025.blend1 --invert-paths
+  git push --force origin main
+  ```
+  Trade-off: rewriting history diverges the GCT fork from Bruno's upstream
+  hash chain, so `bruno-upstream` remote fetches will show phantom
+  divergence and clean rebases against Bruno's future updates become harder.
+  Only do this if (a) clone size becomes an actual pain point or (b) you've
+  decided you'll never merge Bruno's upstream changes again.
+- Add `resources/*.blend1` to `.gitignore` going forward so new Blender
+  backups don't re-enter the repo regardless of history decision.

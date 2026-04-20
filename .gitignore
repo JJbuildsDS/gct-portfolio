@@ -10,3 +10,8 @@ dist
 
 # Claude Code local config (launch configs, session state)
 .claude/
+
+# Blender autosave backups — don't recommit once cleaned from history (see FUTURE.md)
+resources/*.blend1
+resources/*.blend2
+resources/*.blend3
