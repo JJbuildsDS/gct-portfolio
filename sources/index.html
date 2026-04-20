@@ -41,15 +41,21 @@
     <link rel="preload" href="/intro/sound.ktx" as="fetch" crossorigin>
     <link rel="preload" href="/palette.ktx" as="fetch" crossorigin>
     
-    <!-- Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-JMSN30BQ5J"></script>
+    <!-- Analytics — gated on VITE_ANALYTICS_TAG so nothing loads until Jasraaj
+         wires up a GCT-owned GA4 / Plausible property. Bruno's hardcoded
+         G-JMSN30BQ5J was stripped out so your traffic no longer feeds his
+         dashboard. Drop your own ID into the VITE_ANALYTICS_TAG env var and
+         uncomment the block below. -->
+    <!--
+    <script async src="https://www.googletagmanager.com/gtag/js?id=%VITE_ANALYTICS_TAG%"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-
         gtag('config', '%VITE_ANALYTICS_TAG%');
     </script>
+    -->
+
 </head>
 <body>
 
