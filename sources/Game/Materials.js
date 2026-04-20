@@ -30,7 +30,10 @@ export class Materials
         this.createEmissiveGradient('emissiveGreenRadialGradient', '#f8ffa6', '#74ff00', 1.5, true, this.debugPanel?.addFolder({ title: 'emissiveGreenRadialGradient' }))
         this.createEmissiveGradient('emissiveWhiteRadialGradient', '#ffffff', '#666666', 2.7, false, this.debugPanel?.addFolder({ title: 'emissiveWhiteRadialGradient' }))
         
-        this.createGradient('redGradient', '#ff3a3a', '#721551', this.debugPanel?.addFolder({ title: 'redGradient' }))
+        // GCT Phase 4: retuned from Bruno's red→purple (#ff3a3a → #721551) to tandoori crimson gradient
+        // Used by VisualVehicle paints.red (Tandoori skin) AND as the base clone for the flames skin.
+        // Flames overrides the outputNode entirely, so base colors only affect the static paint.
+        this.createGradient('redGradient', '#E63946', '#7A1F1F', this.debugPanel?.addFolder({ title: 'redGradient' }))
     }
 
     createPalette()

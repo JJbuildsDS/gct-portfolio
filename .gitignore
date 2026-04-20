@@ -7,3 +7,6 @@ dist
 .autosave
 .wav
 !static/sounds/music/*.wav
+
+# Claude Code local config (launch configs, session state)
+.claude/

@@ -132,10 +132,14 @@ export class VisualVehicle
         this.paints = {}
 
         this.paints.choices = {}
-        this.paints.choices.red = this.game.materials.getFromName('redGradient')
-        this.paints.choices.orange = this.game.materials.createGradient('orangeGradient', '#ff940d', '#af0071', this.game.materials.debugPanel?.addFolder({ title: 'orangeGradient' }))
-        this.paints.choices.white = this.game.materials.createGradient('whiteGradient', '#ffffff', '#b5b5b5', this.game.materials.debugPanel?.addFolder({ title: 'whiteGradient' }))
-        this.paints.choices.black = this.game.materials.createGradient('blackGradient', '#626262', '#262526', this.game.materials.debugPanel?.addFolder({ title: 'blackGradient' }))
+        // GCT Phase 4 — spice-themed skin gradients
+        // Internal keys (red/orange/white/black) stay unchanged to preserve the 3-layer coupling:
+        //   HTML data-name (index.html:521-562) ↔ paints.choices key ↔ localStorage achievementsReward
+        // Display labels: red=Tandoori · orange=Masala · white=Butter · black=Kadai
+        this.paints.choices.red = this.game.materials.getFromName('redGradient')                                                                                                          // Tandoori — #E63946 → #7A1F1F (Materials.js)
+        this.paints.choices.orange = this.game.materials.createGradient('orangeGradient', '#F4A13C', '#7A3A10', this.game.materials.debugPanel?.addFolder({ title: 'orangeGradient' }))    // Masala — saffron → rust
+        this.paints.choices.white = this.game.materials.createGradient('whiteGradient', '#FAF1D4', '#C9A96A', this.game.materials.debugPanel?.addFolder({ title: 'whiteGradient' }))       // Butter — ghee cream → pale gold
+        this.paints.choices.black = this.game.materials.createGradient('blackGradient', '#4A2817', '#1A0D08', this.game.materials.debugPanel?.addFolder({ title: 'blackGradient' }))       // Kadai — smoky char brown → near-black
         
         // Flames
         {

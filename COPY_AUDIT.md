@@ -6,6 +6,25 @@ This file lists every Bruno-identity reference found in the codebase and shows w
 
 ---
 
+## ✅ Swapped in Phase 4 (skin gradients)
+
+Skin colors now map to spice-themed GCT palette. **Internal keys unchanged** to preserve the 3-layer coupling (HTML `data-name` ↔ `paints.choices` key ↔ `localStorage['achievementsReward']`).
+
+| Internal key | Display name | Gradient A → B | File |
+|--------------|--------------|----------------|------|
+| `red`        | Tandoori     | `#E63946 → #7A1F1F` | `sources/Game/Materials.js:33` |
+| `orange`     | Masala       | `#F4A13C → #7A3A10` | `sources/Game/World/VisualVehicle.js:139` |
+| `white`      | Butter       | `#FAF1D4 → #C9A96A` | `sources/Game/World/VisualVehicle.js:140` |
+| `black`      | Kadai        | `#4A2817 → #1A0D08` | `sources/Game/World/VisualVehicle.js:141` |
+| `flames`     | Flaming      | TSL shader unchanged (inherits base from `redGradient`) | `sources/Game/World/VisualVehicle.js:142-185` |
+| `abyssal`    | Abyssal      | TSL shader unchanged | `sources/Game/World/VisualVehicle.js:187-223` |
+
+**TODO for Jasraaj (post-launch):**
+- The achievements panel swatch images (`static/ui/achievements/rewards/*.webp`) are static PNGs from Bruno's build and still show the old red→purple etc. thumbnails. Re-render or regenerate them to match the new spice palette so the UI preview matches the on-chicken paint.
+- The skin tooltip in the HTML currently reads "Unlock at {threshold}" (it's gated by play time, not a name). If you want the spice name visible, add a display label next to the swatch in `sources/index.html:521-562`.
+
+---
+
 ## ✅ Swapped in Phase 2
 
 | File | Line | Before | After |
