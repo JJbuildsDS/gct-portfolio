@@ -67,18 +67,59 @@ export class Player
                 item.rate = 0.9 + Math.random() * 0.2
             }
         })
-        this.sounds.honk = this.game.audio.register(
-        {
-            path: 'sounds/vehicle/honk/Car Horn Long 4.mp3',
-            autoplay: true,
-            loop: true,
-            volume: 0.4,
-            antiSpam: 0.1,
-            onPlaying: (item) =>
+        // GCT Phase 6 — one-shot cluck (was: Bruno's looping horn with volume-gate)
+        // The honk input (H key) now fires a single cluck per press with slight pitch randomness.
+        // TODO(Jasraaj): drop at least 2-4 CC0 chicken-cluck variants at:
+        //   static/sounds/chicken/cluck-01.mp3
+        //   static/sounds/chicken/cluck-02.mp3
+        //   static/sounds/chicken/cluck-03.mp3 (optional)
+        //   static/sounds/chicken/cluck-04.mp3 (optional)
+        // Source: freesound.org CC0 search "chicken cluck" or "hen cluck single".
+        // Once the real files are present:
+        //   1. Change the `path` below to 'sounds/chicken/cluck-01.mp3'.
+        //   2. Uncomment the additional register() calls in the same 'clucks' group so
+        //      group.play() rotates through all variants for pitch/tone variety.
+        //   3. Until real files exist, Bruno's horn plays as a placeholder so the
+        //      code path works end-to-end — no load error, no silence. Just not a chicken yet.
+        this.sounds.cluck = this.game.audio.register({
+            group: 'clucks',
+            path: 'sounds/vehicle/honk/Car Horn Long 4.mp3', // TODO: replace with 'sounds/chicken/cluck-01.mp3'
+            autoplay: false,
+            loop: false,
+            volume: 0.55,
+            antiSpam: 0.18,
+            onPlay: (item) =>
             {
-                item.volume = this.game.inputs.actions.get('honk').active ? 0.5 : 0
+                // Slight rate jitter so repeat presses don't sound identical
+                item.rate = 0.92 + Math.random() * 0.18
             }
         })
+        // TODO(Jasraaj): uncomment once additional cluck files exist.
+        // this.game.audio.register({
+        //     group: 'clucks',
+        //     path: 'sounds/chicken/cluck-02.mp3',
+        //     autoplay: false, loop: false, volume: 0.55, antiSpam: 0.18,
+        //     onPlay: (item) => { item.rate = 0.92 + Math.random() * 0.18 }
+        // })
+        // this.game.audio.register({
+        //     group: 'clucks',
+        //     path: 'sounds/chicken/cluck-03.mp3',
+        //     autoplay: false, loop: false, volume: 0.55, antiSpam: 0.18,
+        //     onPlay: (item) => { item.rate = 0.92 + Math.random() * 0.18 }
+        // })
+
+        // GCT Phase 6 — ambient kukdu-ku coop bed (was: Bruno had no analogue; this is a net-new layer).
+        // Low-volume background looping rooster / hen coop ambience that plays under the gameplay
+        // music. Creates the "farm" feel even when the chicken is idle.
+        // TODO(Jasraaj): drop 'static/sounds/chicken/kukdu-ku-loop.mp3' (CC0, ~15-30s seamless loop).
+        // Source: freesound.org CC0 search "rooster loop" or "farmyard ambience".
+        // Commented out until the file exists — otherwise Audio.js logs a load error on boot.
+        // this.sounds.kukduKu = this.game.audio.register({
+        //     path: 'sounds/chicken/kukdu-ku-loop.mp3',
+        //     autoplay: true,
+        //     loop: true,
+        //     volume: 0.08,
+        // })
         this.sounds.spring1 = this.game.audio.register({
             path: 'sounds/vehicle/springs/HandleSqueak_BW.60329.mp3',
             autoplay: false,
@@ -502,7 +543,16 @@ export class Player
 
     honk()
     {
-        // Suspensions
+        // GCT Phase 6 — play one cluck per press, rotating through the 'clucks' group.
+        // group.play() picks the next item round-robin; anti-spam on each item prevents
+        // runaway overlap if H is held. With only 1 item registered (the placeholder), it
+        // fires the same sample every time with a randomized playback rate.
+        const clucksGroup = this.game.audio.groups.get('clucks')
+        if(clucksGroup)
+            clucksGroup.play()
+
+        // Suspensions (keep Bruno's wheel-bump gag — it reads well with a cluck too:
+        // chicken hops, chassis dips slightly)
         const randomWheelIndex = Math.floor(Math.random() * 4)
         const previousState = this.suspensions[randomWheelIndex]
         this.suspensions[ randomWheelIndex ] = 'mid'
@@ -515,7 +565,7 @@ export class Player
             }
         })
 
-        // Achievement
+        // Achievement (internal name stays 'honk' — tied to achievement config + localStorage)
         this.game.achievements.addProgress('honk')
     }
 
