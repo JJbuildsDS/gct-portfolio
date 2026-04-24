@@ -1,35 +1,35 @@
 import * as THREE from 'three/webgpu'
 
 const text = `
-██████╗ ██████╗ ██╗   ██╗███╗   ██╗ ██████╗ ██╗███████╗                   
-██╔══██╗██╔══██╗██║   ██║████╗  ██║██╔═══██╗╚═╝██╔════╝                   
-██████╔╝██████╔╝██║   ██║██╔██╗ ██║██║   ██║   ███████╗                   
-██╔══██╗██╔══██╗██║   ██║██║╚██╗██║██║   ██║   ╚════██║                   
-██████╔╝██║  ██║╚██████╔╝██║ ╚████║╚██████╔╝   ███████║                   
-╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝    ╚══════╝                   
-                                                                       
-██████╗  ██████╗ ██████╗ ████████╗███████╗ ██████╗ ██╗     ██╗ ██████╗ 
-██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝██╔════╝██╔═══██╗██║     ██║██╔═══██╗
-██████╔╝██║   ██║██████╔╝   ██║   █████╗  ██║   ██║██║     ██║██║   ██║
-██╔═══╝ ██║   ██║██╔══██╗   ██║   ██╔══╝  ██║   ██║██║     ██║██║   ██║
-██║     ╚██████╔╝██║  ██║   ██║   ██║     ╚██████╔╝███████╗██║╚██████╔╝
-╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   ╚═╝      ╚═════╝ ╚══════╝╚═╝ ╚═════╝ 
+ ██████╗  █████╗ ██████╗ ██╗     ██╗ ██████╗
+██╔════╝ ██╔══██╗██╔══██╗██║     ██║██╔════╝
+██║  ███╗███████║██████╔╝██║     ██║██║
+██║   ██║██╔══██║██╔══██╗██║     ██║██║
+╚██████╔╝██║  ██║██║  ██║███████╗██║╚██████╗
+ ╚═════╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝╚══════╝╚═╝ ╚═════╝
+
+ ██████╗██╗  ██╗██╗ ██████╗██╗  ██╗███████╗███╗   ██╗
+██╔════╝██║  ██║██║██╔════╝██║ ██╔╝██╔════╝████╗  ██║
+██║     ███████║██║██║     █████╔╝ █████╗  ██╔██╗ ██║
+██║     ██╔══██║██║██║     ██╔═██╗ ██╔══╝  ██║╚██╗██║
+╚██████╗██║  ██║██║╚██████╗██║  ██╗███████╗██║ ╚████║
+ ╚═════╝╚═╝  ╚═╝╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═══╝
+
+████████╗██╗██╗  ██╗██╗  ██╗ █████╗
+╚══██╔══╝██║██║ ██╔╝██║ ██╔╝██╔══██╗
+   ██║   ██║█████╔╝ █████╔╝ ███████║
+   ██║   ██║██╔═██╗ ██╔═██╗ ██╔══██║
+   ██║   ██║██║  ██╗██║  ██╗██║  ██║
+   ╚═╝   ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝
 
 ╔═ Intro ═══════════════╗
-║ Thank you for visiting my portfolio, you sneaky developer!
-║ If you are curious about the stack and how I built this project, here’s everything you need to know.
+║ Welcome to the Garlic Chicken Tikka studio — thanks for poking around under the hood.
+║ This world is a fork of Bruno Simon's folio-2025 (MIT licensed), re-dressed for GCT.
 ╚═══════════════════════╝
 
-╔═ Socials ═══════════════╗
-║ Mail           ⇒ simon.bruno.77@gmail.com
-║ X              ⇒ https://x.com/bruno_simon
-║ BlueSKy        ⇒ https://bsky.app/profile/bruno-simon.bsky.social
-║ Discord public ⇒ https://discord.com/channels/769928116701233152/1445064878384480288
-║ Discord PM     ⇒ https://discord.com/users/202907325722263553
-║ Youtube        ⇒ https://www.youtube.com/@BrunoSimon
-║ Twitch         ⇒ https://www.twitch.tv/bruno_simon_dev
-║ GitHub         ⇒ https://github.com/brunosimon
-║ LinkedIn       ⇒ https://www.linkedin.com/in/simonbruno77/
+╔═ Say hi ════════════════╗
+║ Mail         ⇒ hello@studiogct.com
+║ Instagram    ⇒ https://www.instagram.com/garlicchickentikka
 ╚═══════════════════════╝
 
 ╔═ Debug ═══════════════╗
@@ -38,7 +38,7 @@ const text = `
 ╚═══════════════════════╝
 
 ╔═ Three.js ════════════╗
-║ Three.js is the library I’m using to render this 3D world (release: ${THREE.REVISION})
+║ Three.js is the library used to render this 3D world (release: ${THREE.REVISION})
 ║ https://threejs.org/
 ║ It was created by mr.doob (https://x.com/mrdoob, https://github.com/mrdoob),
 ║ followed by hundreds of awesome developers,
@@ -46,28 +46,15 @@ const text = `
 ║ enabling the use of both WebGL and WebGPU, making this portfolio possible.
 ╚═══════════════════════╝
 
-╔═ Three.js Journey ════╗
-║ If you want to learn Three.js, I got you covered with this huge course.
-║ https://threejs-journey.com/
-║ It contains everything you need to start building awesome stuff with Three.js (and much more).
-╚═══════════════════════╝
-
-╔═ Devlogs ═════════════╗
-║ I’ve been making devlogs since the very start of this portfolio
-║ and you can find them all on my Youtube channel.
-║ https://www.youtube.com/@BrunoSimon
-╚═══════════════════════╝
-
-╔═ Source code ═════════╗
-║ The code is available on GitHub under MIT license. Even the Blender files are there, so have fun!
+╔═ Original project ════╗
+║ This site is built on top of Bruno Simon's open-source folio-2025 (MIT license).
 ║ https://github.com/brunosimon/folio-2025
-║ For security reasons, I’m not sharing the server code, but the portfolio works without it.
+║ Huge thanks to Bruno — go watch his devlogs on YouTube (@BrunoSimon).
 ╚═══════════════════════╝
 
 ╔═ Musics ══════════════╗
-║ The music you hear was made especially for this portfolio by the awesome Kounine (Linktree).
+║ The music was made by the awesome Kounine for Bruno's original portfolio and released under CC0.
 ║ https://linktr.ee/Kounine
-║ They are now under CC0 license, meaning you can do whatever you want with them!
 ║ Download them here.
 ║ https://github.com/brunosimon/folio-2025/tree/main/static/sounds/musics
 ╚═══════════════════════╝
