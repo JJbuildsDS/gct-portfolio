@@ -23,17 +23,14 @@ export class LandingArea extends Area
 
     setLetters()
     {
+        // Bruno's "BRUNO SIMON" letters hidden until GCT replacements land in Blender.
         const references = this.references.items.get('letters')
 
         for(const reference of references)
         {
-            const physical = reference.userData.object.physical
-            physical.colliders[0].setActiveEvents(this.game.RAPIER.ActiveEvents.CONTACT_FORCE_EVENTS)
-            physical.colliders[0].setContactForceEventThreshold(5)
-            physical.onCollision = (force, position) =>
-            {
-                this.game.audio.groups.get('hitBrick').playRandomNext(force, position)
-            }
+            const object = reference.userData.object
+            object.visual.object3D.visible = false
+            object.physical.body.setEnabled(false)
         }
     }
 
