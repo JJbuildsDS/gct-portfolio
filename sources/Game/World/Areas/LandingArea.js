@@ -23,14 +23,36 @@ export class LandingArea extends Area
 
     setLetters()
     {
-        // Bruno's "BRUNO SIMON" letters hidden until GCT replacements land in Blender.
-        const references = this.references.items.get('letters')
-
-        for(const reference of references)
+        // Hide Bruno's BRUNO SIMON letters and drop in GCT 3D text instead.
+        // After Area.setObjects() runs, each entry in this.objects.items has
+        // .visual.object3D pointing at the original (renamed) child mesh.
+        // The cleanup regex in Objects.getFromModel strips PhysicalDynamic from
+        // names, so `refLettersPhysicalDynamic.010` ends up as `refLetters.010`.
+        for(const object of this.objects.items)
         {
-            const object = reference.userData.object
-            object.visual.object3D.visible = false
-            object.physical.body.setEnabled(false)
+            const name = object.visual?.object3D?.name || ''
+            if(/letters/i.test(name))
+            {
+                if(object.visual?.object3D)
+                    object.visual.object3D.visible = false
+                if(object.physical?.body)
+                    object.physical.body.setEnabled(false)
+            }
+        }
+
+        // gct-letters.glb is authored in landing-local coordinates (the same space
+        // the original BRUNO SIMON letters live in), so we attach its scene root
+        // to the world scene at the landing's world transform.
+        const gctLettersModel = this.game.resources.gctLettersModel
+        if(gctLettersModel)
+        {
+            const root = gctLettersModel.scene
+            // Apply landing's world transform once so the letters land in the
+            // right spot (landing world: ~49.25, -38.52, 3.27).
+            root.position.copy(this.model.position)
+            root.quaternion.copy(this.model.quaternion)
+            root.scale.copy(this.model.scale)
+            this.game.scene.add(root)
         }
     }
 
