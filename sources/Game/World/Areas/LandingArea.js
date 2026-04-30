@@ -6,6 +6,12 @@ import { Area } from './Area.js'
 import gsap from 'gsap'
 import { MeshDefaultMaterial } from '../../Materials/MeshDefaultMaterial.js'
 
+// GCT brand red — tikka-spice color that reads warm against the landing area's
+// stone/grass. Not pure white, not heavily saturated — sits in the same value
+// range as the rest of the scene's flat-color toon palette so bloom doesn't
+// turn it into a blowout.
+const GCT_LETTER_COLOR = 0xC44A2E
+
 export class LandingArea extends Area
 {
     constructor(model)
@@ -52,6 +58,28 @@ export class LandingArea extends Area
             root.position.copy(this.model.position)
             root.quaternion.copy(this.model.quaternion)
             root.scale.copy(this.model.scale)
+
+            // Replace the GLB's baked Principled BSDF with the scene's
+            // MeshDefaultMaterial. The default GLB material was a Standard
+            // material with a hint of emission; combined with the WebGPU
+            // bloom pipeline that produced a pure-white blowout. Using
+            // MeshDefaultMaterial integrates the letters with scene lighting,
+            // shadows, fog, and the reveal effect — same look as everything
+            // else in landing.
+            const letterMaterial = new MeshDefaultMaterial({
+                colorNode: color(GCT_LETTER_COLOR),
+                hasWater: false
+            })
+            root.traverse((child) =>
+            {
+                if(child.isMesh)
+                {
+                    child.material = letterMaterial
+                    child.castShadow = true
+                    child.receiveShadow = true
+                }
+            })
+
             this.game.scene.add(root)
         }
     }
